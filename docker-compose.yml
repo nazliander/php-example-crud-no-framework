@@ -1,0 +1,32 @@
+version: "3.1"
+
+services:
+  php:
+    build:
+      context: ./docker/php/.
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - ./api:/var/www/html/
+    environment:
+      # Goes to the db service within the docker-compose
+      MYSQL_HOSTNAME: db
+      MYSQL_USER: dev
+      MYSQL_DATABASE: test
+      MYSQL_PASSWORD: test12345
+
+  db:
+    image: mysql:8
+    command: --default-authentication-plugin=mysql_native_password
+    restart: on-failure
+    volumes:
+      # Initializes a Mysql DB with some data in it
+      - ./docker/db_init_files:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: test
+      MYSQL_USER: dev
+      MYSQL_PASSWORD: test12345
